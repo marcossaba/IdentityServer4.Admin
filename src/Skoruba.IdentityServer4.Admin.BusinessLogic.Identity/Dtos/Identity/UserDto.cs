@@ -5,7 +5,7 @@ using Skoruba.IdentityServer4.Admin.BusinessLogic.Identity.Dtos.Identity.Base;
 namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Identity.Dtos.Identity
 {
     public class UserDto<TKey> : BaseUserDto<TKey>
-    {        
+    {
         [Required]
         [RegularExpression(@"^[a-zA-Z0-9_@\-\.\+]+$")]
         public string UserName { get; set; }
@@ -27,5 +27,11 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Identity.Dtos.Identity
         public string AccessFailedCount { get; set; }
 
         public DateTimeOffset? LockoutEnd { get; set; }
+         
+        public string SIO_Apodo { get;set; }
+
+        public string SIO_uid { get; set; }
+
+        public string given_name { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
+using Serilog.Events;
 using Skoruba.IdentityServer4.Admin.Helpers;
 
 namespace Skoruba.IdentityServer4.Admin
@@ -32,7 +33,17 @@ namespace Skoruba.IdentityServer4.Admin
             WebHost.CreateDefaultBuilder(args)
                    .UseKestrel(c => c.AddServerHeader = false)
                    .UseStartup<Startup>()
-                   .UseSerilog()
+                   .UseSerilog((context, configuration) =>
+                   {
+                       configuration
+                           .MinimumLevel.Debug()
+                           .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                           .MinimumLevel.Override("System", LogEventLevel.Warning)
+                           .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Information)
+                           .Enrich.FromLogContext()
+                           .WriteTo.File(@"identityserver_Admin_log.txt");
+                           //.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Literate);
+                   })
                    .Build();
     }
 }

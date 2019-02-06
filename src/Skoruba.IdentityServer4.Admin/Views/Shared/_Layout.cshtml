@@ -58,7 +58,7 @@
 		<!--Menu item -->
 		@if (User.Identity.IsAuthenticated)
 		{
-			<a class="menu-item my-2 btn btn-outline-primary" asp-action="Logout" asp-controller="Account">@User.GetDisplayName() - @Localizer["LinkLogout"]</a>
+			<a class="menu-item my-2 btn btn-outline-primary" asp-action="Logout" asp-controller="Account">@User?.Claims?.First(c=>c.Type.Equals("given_name"))?.Value - @Localizer["LinkLogout"]</a>
 		}
 
 		<!--Menu button - show in < MD -->

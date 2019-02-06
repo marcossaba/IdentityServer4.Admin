@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Mvc.Localization
 @using Skoruba.IdentityServer4.Admin.BusinessLogic.Identity.Dtos.Identity
 @using Skoruba.IdentityServer4.Admin.BusinessLogic.Shared.Dtos.Common
-@model UsersDto<UserDto<int>, int>
+@model UsersDto<UserDto<string>, string>
 @inject IViewLocalizer Localizer
 
 @{
@@ -26,10 +26,11 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th></th>
-                        <th>@Localizer["UserId"]</th>
-                        <th>@Localizer["UserName"]</th>
-                        <th>@Localizer["Email"]</th>
+                        @*<th></th>*@
+                        <th>Nombre</th>
+                        <th>Apodo</th>
+                        <th>@Localizer["UserId"] (SIO)</th>
+                         
                         <th></th>
                     </tr>
                 </thead>
@@ -37,20 +38,21 @@
                 <tbody>
                     @foreach (var user in Model.Users)
                     {
-                        <tr>
-                            <td class="align-middle">
-                                <a class="btn btn-primary" asp-action="UserProfile" asp-route-id="@user.Id">@Localizer["ActionEditUser"]</a>
-                            </td>
-                            <td class="align-middle">
-                                <img-gravatar email="@user.Email" class="gravatar-image img-thumbnail" />
-                            </td>
-                            <td class="align-middle">@user.Id</td>
-                            <td class="align-middle">@user.UserName</td>
-                            <td class="align-middle">@user.Email</td>
-                            <td class="align-middle">
-                                <a class="btn btn-danger" asp-action="UserDelete" asp-route-id="@user.Id"><span class="oi oi-x"></span></a>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td class="align-middle">
+                            <a class="btn btn-primary" asp-action="UserProfile" asp-route-id="@user.Id">@Localizer["ActionEditUser"]</a>
+                        </td>
+                        @*<td class="align-middle">
+                            <img-gravatar email="@user.Email" class="gravatar-image img-thumbnail" />
+                        </td>*@
+                        <td class="align-middle">@user.given_name</td>
+                        <td class="align-middle">@user.SIO_Apodo</td>
+                        <td class="align-middle">@user.SIO_uid</td>
+
+                        <td class="align-middle">
+                            <a class="btn btn-danger" asp-action="UserDelete" asp-route-id="@user.Id"><span class="oi oi-x"></span></a>
+                        </td>
+                    </tr>
                     }
                 </tbody>
             </table>

@@ -53,8 +53,8 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Identity.Repositories
 
             Expression<Func<PersistedGrantDataView, bool>> searchCondition = x => x.SubjectId.Contains(search) || x.SubjectName.Contains(search);
 
-            var persistedGrantsData = await persistedGrantByUsers.WhereIf(!string.IsNullOrEmpty(search), searchCondition).PageBy(x => x.SubjectId, page, pageSize).ToListAsync();
-            var persistedGrantsDataCount = await persistedGrantByUsers.WhereIf(!string.IsNullOrEmpty(search), searchCondition).CountAsync();
+            var persistedGrantsData = await persistedGrantByUsers.ToListAsync() ;// await persistedGrantByUsers.WhereIf(!string.IsNullOrEmpty(search), searchCondition).PageBy(x => x.SubjectId, page, pageSize).ToListAsync();
+            var persistedGrantsDataCount = persistedGrantsData.Count;// await persistedGrantByUsers.WhereIf(!string.IsNullOrEmpty(search), searchCondition).CountAsync();
 
             pagedList.Data.AddRange(persistedGrantsData);
             pagedList.TotalCount = persistedGrantsDataCount;

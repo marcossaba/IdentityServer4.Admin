@@ -61,8 +61,15 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Identity.Services
         public async Task<UsersDto<TUserDto, TUserDtoKey>> GetUsersAsync(string search, int page = 1, int pageSize = 10)
         {
             var pagedList = await _identityRepository.GetUsersAsync(search, page, pageSize);
-            var usersDto = _mapper.Map<UsersDto<TUserDto, TUserDtoKey>>(pagedList);
-
+            var usersDto = new UsersDto<TUserDto, TUserDtoKey>();
+            usersDto.TotalCount = pagedList.TotalCount;
+            usersDto.PageSize = pagedList.PageSize;
+            foreach (var user in pagedList.Data)
+            {
+                var userdto = _mapper.Map<TUserDto>(user);
+                await this.CompletarClaims(user, userdto);
+                usersDto.Users.Add(userdto);
+            }
             return usersDto;
         }
 
@@ -121,6 +128,8 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Identity.Services
             return (handleIdentityError, roleId);
         }
 
+       
+
         public async Task<TUserDto> GetUserAsync(string userId)
         {
             var identity = await _identityRepository.GetUserAsync(userId);
@@ -128,7 +137,18 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Identity.Services
 
             var userDto = _mapper.Map<TUserDto>(identity);
 
+            await CompletarClaims(identity, userDto);
+
             return userDto;
+        }
+
+        private async Task CompletarClaims(TUser identity, TUserDto userDto)
+        {
+            var claims = await _identityRepository.GetUserClaimsAsync(identity.Id.ToString());
+
+            userDto.SIO_Apodo = (claims.Data?.Find(cl => cl.ClaimType.Equals("sio_apodo"))?.ClaimValue) ?? "--";
+            userDto.SIO_uid = (claims.Data?.Find(cl => cl.ClaimType.Equals("sio_uid"))?.ClaimValue) ?? "--";
+            userDto.given_name = (claims.Data?.Find(cl => cl.ClaimType.Equals("given_name"))?.ClaimValue) ?? "--";
         }
 
         public async Task<(IdentityResult identityResult, TKey userId)> CreateUserAsync(TUserDto user)
