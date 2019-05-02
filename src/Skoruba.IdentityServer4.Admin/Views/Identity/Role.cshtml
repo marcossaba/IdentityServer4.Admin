@@ -27,7 +27,7 @@
 
 	<div asp-validation-summary="All" class="text-danger"></div>
 
-		@if (!EqualityComparer<string>.Default.Equals(Model.Id, default(string)) && !Model.IsDefaultId())
+		@if (!Model.IsDefaultId())
 		{
 	 
 			<!--Button-->

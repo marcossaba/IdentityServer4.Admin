@@ -71,19 +71,19 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Identity.Services
 
         public virtual async Task<TUsersDto> GetUsersAsync(string search, int page = 1, int pageSize = 10)
         {
-            var pagedList = await _identityRepository.GetUsersAsync(search, page, pageSize);
-            var usersDto = new UsersDto<TUserDto, TUserDtoKey>();
-            usersDto.TotalCount = pagedList.TotalCount;
-            usersDto.PageSize = pagedList.PageSize;
+            var pagedList = await IdentityRepository.GetUsersAsync(search, page, pageSize);
+            var usersDto = Mapper.Map<TUsersDto>(pagedList);
+
+            usersDto.Users.Clear();
             foreach (var user in pagedList.Data)
             {
-                var userdto = _mapper.Map<TUserDto>(user);
+                var userdto = Mapper.Map<TUserDto>(user);
                 await this.CompletarClaims(user, userdto);
                 usersDto.Users.Add(userdto);
             }
-     
 
-            return usersDto;
+
+            return usersDto; 
         }
 
         public virtual async Task<TUsersDto> GetRoleUsersAsync(string roleId, string search, int page = 1, int pageSize = 10)
@@ -168,7 +168,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Identity.Services
 
         private async Task CompletarClaims(TUser identity, TUserDto userDto)
         {
-            var claims = await _identityRepository.GetUserClaimsAsync(identity.Id.ToString());
+            var claims = await IdentityRepository.GetUserClaimsAsync(identity.Id.ToString());
 
             userDto.SIO_Apodo = (claims.Data?.Find(cl => cl.ClaimType.Equals("sio_apodo"))?.ClaimValue) ?? "--";
             userDto.SIO_uid = (claims.Data?.Find(cl => cl.ClaimType.Equals("sio_uid"))?.ClaimValue) ?? "--";
