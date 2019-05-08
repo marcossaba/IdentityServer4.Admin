@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -61,6 +62,48 @@ namespace Skoruba.IdentityServer4.Admin.Api.Controllers
             var user = await _identityService.GetUserAsync(id.ToString());
            
             return Ok(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody]TUserDto user)
+        {
+             
+            TKey userId;
+
+            if (EqualityComparer<TUserDtoKey>.Default.Equals(user.Id, default))
+            {
+                var userData = await _identityService.CreateUserAsync(user);
+                userId = userData.userId;
+            }
+            else
+            {
+                var userData = await _identityService.UpdateUserAsync(user);
+                userId = userData.userId;
+            }
+ 
+
+            return Ok(user);
+        }
+
+
+        [HttpPost("{id}/ChangePassword")]
+        public async Task<IActionResult> UserChangePassword(TUserDtoKey id, [FromBody]TUserChangePasswordDto userPassword)
+        {
+
+            TKey userId;
+
+            var identityResult = await _identityService.UserChangePasswordAsync(userPassword);
+
+
+            return Ok(identityResult);
+        }
+
+       [HttpPost("{id}/UserClaims")]      
+        public async Task<IActionResult> UserClaims(TUserDtoKey id, [FromBody] TUserClaimsDto claim)
+        {            
+            var identityResult = await _identityService.CreateUserClaimsAsync(claim);
+           
+            return Ok(identityResult);
         }
     }
 }
