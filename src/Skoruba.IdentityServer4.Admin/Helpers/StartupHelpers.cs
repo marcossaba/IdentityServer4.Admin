@@ -462,7 +462,7 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
 
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
-                            NameClaimType = JwtClaimTypes.Name,
+                            NameClaimType = JwtClaimTypes.GivenName,
                             RoleClaimType = JwtClaimTypes.Role,
                         };
 
