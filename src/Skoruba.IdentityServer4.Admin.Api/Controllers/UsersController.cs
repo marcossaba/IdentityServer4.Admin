@@ -77,9 +77,9 @@ namespace Skoruba.IdentityServer4.Admin.Api.Controllers
         {
             await _identityService.CreateUserAsync(user);
 
-            return Ok();
+            return Ok(user);
         }
-
+        
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromBody]TUserDto user)
         {
