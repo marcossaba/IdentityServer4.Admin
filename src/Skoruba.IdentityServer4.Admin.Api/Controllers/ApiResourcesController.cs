@@ -1,5 +1,8 @@
 ﻿using System.Threading.Tasks;
+using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Skoruba.IdentityServer4.Admin.Api.Configuration.Constants;
 using Skoruba.IdentityServer4.Admin.Api.Dtos.ApiResources;
 using Skoruba.IdentityServer4.Admin.Api.ExceptionHandling;
 using Skoruba.IdentityServer4.Admin.Api.Mappers;
@@ -12,6 +15,7 @@ namespace Skoruba.IdentityServer4.Admin.Api.Controllers
     [ApiController]
     [TypeFilter(typeof(ControllerExceptionFilterAttribute))]
     [Produces("application/json")]
+    [Authorize(AuthenticationSchemes = IdentityServerAuthenticationDefaults.AuthenticationScheme, Policy = AuthorizationConsts.AdministrationPolicy)]
     public class ApiResourcesController : ControllerBase
     {
         private readonly IApiResourceService _apiResourceService;
@@ -52,6 +56,8 @@ namespace Skoruba.IdentityServer4.Admin.Api.Controllers
         public async Task<IActionResult> Put([FromBody]ApiResourceApiDto apiResourceApi)
         {
             var apiResourceDto = apiResourceApi.ToApiResourceApiModel<ApiResourceDto>();
+
+            await _apiResourceService.GetApiResourceAsync(apiResourceDto.Id);
             await _apiResourceService.UpdateApiResourceAsync(apiResourceDto);
 
             return Ok();
@@ -61,6 +67,8 @@ namespace Skoruba.IdentityServer4.Admin.Api.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var apiResourceDto = new ApiResourceDto { Id = id };
+
+            await _apiResourceService.GetApiResourceAsync(apiResourceDto.Id);
             await _apiResourceService.DeleteApiResourceAsync(apiResourceDto);
 
             return Ok();
@@ -90,6 +98,7 @@ namespace Skoruba.IdentityServer4.Admin.Api.Controllers
             var apiScope = apiScopeApi.ToApiResourceApiModel<ApiScopesDto>();
             apiScope.ApiResourceId = id;
 
+            await _apiResourceService.GetApiResourceAsync(apiScope.ApiResourceId);
             await _apiResourceService.AddApiScopeAsync(apiScope);
             
             return Ok();
@@ -101,16 +110,23 @@ namespace Skoruba.IdentityServer4.Admin.Api.Controllers
             var apiScope = apiScopeApi.ToApiResourceApiModel<ApiScopesDto>();
             apiScope.ApiResourceId = id;
 
+            await _apiResourceService.GetApiResourceAsync(apiScope.ApiResourceId);
+            await _apiResourceService.GetApiScopeAsync(apiScope.ApiResourceId, apiScope.ApiScopeId);
+
             await _apiResourceService.UpdateApiScopeAsync(apiScope);
 
             return Ok();
         }
 
-        [HttpDelete("Scopes/{id}")]
-        public async Task<IActionResult> DeleteScope(int id)
+        [HttpDelete("{id}/Scopes/{apiScopeId}")]
+        public async Task<IActionResult> DeleteScope(int id, int apiScopeId)
         {
-            var apiScopeDto = new ApiScopesDto { ApiScopeId = id };
-            await _apiResourceService.DeleteApiScopeAsync(apiScopeDto);
+            var apiScope = new ApiScopesDto { ApiResourceId = id, ApiScopeId = apiScopeId };
+
+            await _apiResourceService.GetApiResourceAsync(apiScope.ApiResourceId);
+            await _apiResourceService.GetApiScopeAsync(apiScope.ApiResourceId, apiScope.ApiScopeId);
+
+            await _apiResourceService.DeleteApiScopeAsync(apiScope);
 
             return Ok();
         }
@@ -147,9 +163,10 @@ namespace Skoruba.IdentityServer4.Admin.Api.Controllers
         [HttpDelete("Secrets/{secretId}")]
         public async Task<IActionResult> DeleteSecret(int secretId)
         {
-            var apiSecretsDto = new ApiSecretsDto { ApiSecretId = secretId };
+            var apiSecret = new ApiSecretsDto { ApiSecretId = secretId };
 
-            await _apiResourceService.DeleteApiSecretAsync(apiSecretsDto);
+            await _apiResourceService.GetApiSecretAsync(apiSecret.ApiSecretId);
+            await _apiResourceService.DeleteApiSecretAsync(apiSecret);
 
             return Ok();
         }
@@ -186,9 +203,10 @@ namespace Skoruba.IdentityServer4.Admin.Api.Controllers
         [HttpDelete("Properties/{propertyId}")]
         public async Task<IActionResult> DeleteProperty(int propertyId)
         {
-            var apiResourcePropertiesDto = new ApiResourcePropertiesDto { ApiResourcePropertyId = propertyId };
+            var apiResourceProperty = new ApiResourcePropertiesDto { ApiResourcePropertyId = propertyId };
 
-            await _apiResourceService.DeleteApiResourcePropertyAsync(apiResourcePropertiesDto);
+            await _apiResourceService.GetApiResourcePropertyAsync(apiResourceProperty.ApiResourcePropertyId);
+            await _apiResourceService.DeleteApiResourcePropertyAsync(apiResourceProperty);
 
             return Ok();
         }

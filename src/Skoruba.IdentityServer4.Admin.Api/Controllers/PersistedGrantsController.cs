@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
+using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
-using Skoruba.IdentityServer4.Admin.Api.Dtos.Clients;
+using Skoruba.IdentityServer4.Admin.Api.Configuration.Constants;
 using Skoruba.IdentityServer4.Admin.Api.Dtos.PersistedGrants;
 using Skoruba.IdentityServer4.Admin.Api.ExceptionHandling;
 using Skoruba.IdentityServer4.Admin.Api.Helpers;
 using Skoruba.IdentityServer4.Admin.Api.Mappers;
-using Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Configuration;
 using Skoruba.IdentityServer4.Admin.BusinessLogic.Identity.Services.Interfaces;
 
 namespace Skoruba.IdentityServer4.Admin.Api.Controllers
@@ -15,6 +15,7 @@ namespace Skoruba.IdentityServer4.Admin.Api.Controllers
     [ApiController]
     [TypeFilter(typeof(ControllerExceptionFilterAttribute))]
     [Produces("application/json")]
+    [Authorize(AuthenticationSchemes = IdentityServerAuthenticationDefaults.AuthenticationScheme, Policy = AuthorizationConsts.AdministrationPolicy)]
     public class PersistedGrantsController : ControllerBase
     {
         private readonly IPersistedGrantAspNetIdentityService _persistedGrantsService;
