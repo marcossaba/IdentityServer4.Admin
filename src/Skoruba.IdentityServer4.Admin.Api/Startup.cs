@@ -15,6 +15,7 @@ using Skoruba.IdentityServer4.Admin.BusinessLogic.Identity.Dtos.Identity;
 using Skoruba.IdentityServer4.Admin.EntityFramework.DbContexts;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Identity.Entities.Identity;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Linq;
 
 namespace Skoruba.IdentityServer4.Admin.Api
 {
@@ -50,8 +51,9 @@ namespace Skoruba.IdentityServer4.Admin.Api
             services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
                 .AddIdentityServerAuthentication(options =>
                 {
-                    options.Authority = AuthorizationConsts.IdentityServerBaseUrl;
-                    options.ApiName = AuthorizationConsts.ApiName;
+                    options.Authority = Configuration.GetSection("AdminConfiguration").GetValue<string>("IdentityServerBaseUrl");
+                    options.ApiName = Configuration.GetSection("AdminConfiguration").GetValue<string>("ClientId");
+                    options.ApiSecret = Configuration.GetSection("AdminConfiguration").GetValue<string>("ClientSecret");                    
 #if DEBUG
                     options.RequireHttpsMetadata = false;
 #else
@@ -96,9 +98,9 @@ namespace Skoruba.IdentityServer4.Admin.Api
                 options.AddSecurityDefinition("oauth2", new OAuth2Scheme
                 {
                     Flow = "implicit",
-                    AuthorizationUrl = $"{AuthorizationConsts.IdentityServerBaseUrl}/connect/authorize",
+                    AuthorizationUrl = $"{Configuration.GetSection("AdminConfiguration").GetValue<string>("IdentityServerBaseUrl")}/connect/authorize",
                     Scopes = new Dictionary<string, string> {
-                        { AuthorizationConsts.ApiName, ApiConfigurationConsts.ApiName }
+                        { Configuration.GetSection("AdminConfiguration").GetValue<string>("ClientId"), ApiConfigurationConsts.ApiName }
                     }
                 });
 
@@ -120,7 +122,7 @@ namespace Skoruba.IdentityServer4.Admin.Api
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", ApiConfigurationConsts.ApiName);
 
-                c.OAuthClientId(AuthorizationConsts.ApiClientId);
+                c.OAuthClientId(Configuration.GetSection("AdminConfiguration").GetValue<string>("ClientId"));
                 c.OAuthAppName("Skoruba IdentityServer Admin Api");
             });
 

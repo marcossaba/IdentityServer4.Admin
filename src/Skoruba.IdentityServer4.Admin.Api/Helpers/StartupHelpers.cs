@@ -115,8 +115,7 @@ namespace Skoruba.IdentityServer4.Admin.Api.Helpers
         {
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(AuthorizationConsts.AdministrationPolicy,
-                    policy => policy.RequireRole(AuthorizationConsts.AdministrationRole));
+                options.AddPolicy(AuthorizationConsts.AdministrationPolicy, policy => policy.RequireClaim("client_ids4_admin_api"));
             });
         }
     }
